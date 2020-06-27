@@ -1,24 +1,51 @@
-# Spring PetClinic Sample Application built with Spring Data JDBC
+# Spring petclinic data jdbc 과제
 
-This is a branch of the official [Spring PetClinic](https://github.com/spring-projects/spring-petclinic) application with domain & persistence layer built with [Spring Data JDBC](https://projects.spring.io/spring-data-jdbc/) instead of [Spring Data JPA](https://projects.spring.io/spring-data-jpa/).
 
-Additionally:
+## * 어플리케이션 빌드 및 배포, 실행방법
 
-- uses [TestContainers](http://testcontainers.org/) to spin up MySQL during integtation tests
-- uses [Wavefront](https://www.wavefront.com/) for monitoring
+과제에 대한 실행은 다음과 같이 3가지의 순서로 진행합니다.
 
-Check original project [readme](https://github.com/spring-projects/spring-petclinic/blob/master/readme.md) for introduction the project, how to run, and how to contribute.
+1. Gradle로 어플리케이션 빌드
+2. Docker 이미지 빌드 및 Dockerhub에 Push
+3. Kubernetes 상에서 배포 및 실행
 
-## Understanding the Spring Petclinic application with a few diagrams
 
-[See the presentation here](http://fr.slideshare.net/AntoineRey/spring-framework-petclinic-sample-application)
+## 1. Gradle로 어플리케이션 빌드
 
-## Interesting Spring Petclinic forks
+* gradle clean으로 기존에 빌드된 파일 제거
 
-The Spring Petclinic master branch in the main [spring-projects](https://github.com/spring-projects/spring-petclinic)
-GitHub org is the "canonical" implementation, currently based on Spring Boot and Thymeleaf.
+```shell
+$ ./gradlew clean
+```
 
-This [spring-petclinic-data-jdbc](https://github.com/spring-petclinic/spring-petclinic-data-jdbc) project is one of the [several forks](https://spring-petclinic.github.io/docs/forks.html) 
-hosted in a special GitHub org: [spring-petclinic](https://github.com/spring-petclinic).
-If you have a special interest in a different technology stack
-that could be used to implement the Pet Clinic then please join the community there.
+* gradle build로 새로 빌드
+
+```shell
+$ ./gradlew bootJar
+```
+
+
+## 2. Docker 이미지 빌드 및 Dockerhub에 Push
+
+* docker build
+
+```shell
+$ ./gradlew jib
+```
+
+* Push된 이미지명 : skwjdgh1/petclinic:latest
+
+
+## 3. Kubernetes 상에서 배포 및 실행
+
+* kubernetes/db 디렉토리 내의 Manifest 실행을 통해 Mysql DB Pod, Service 및 데이터 저장용 PV, PVC 배포
+
+```shell
+$ kubectl apply -f kubernetes/db/
+```
+
+* kubernetes/webwas 디렉토리 내의 Manifest 실행을 통해 Petclinic 어플리케이션용 Webwas Pod, Service 및 Public망에서 어플리케이션 접속용 Ingress 배포
+
+```shell
+$ kubectl apply -f kubernetes/webwas/
+```
